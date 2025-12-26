@@ -2285,9 +2285,9 @@ main() {
             exit $?
         else
             # Otherwise, tell the user they need to run the script as root, and bail
-            printf "%b  %b Sudo utility check\\n" "${OVER}" "${CROSS}"
-            printf "  %b Sudo is needed for the Web Interface to run pihole commands\\n\\n" "${INFO}"
-            printf "  %b %bPlease re-run this installer as root${COL_NC}\\n" "${INFO}" "${COL_RED}"
+            printf "%b  %b Sudo 工具检查\\n" "${OVER}" "${CROSS}"
+            printf "  %b Web 界面需要 Sudo 才能运行 pihole 命令\\n\\n" "${INFO}"
+            printf "  %b %b请以 root 身份重新运行此安装程序${COL_NC}\\n" "${INFO}" "${COL_RED}"
             exit 1
         fi
     fi
@@ -2325,14 +2325,14 @@ main() {
     funcOutput=$(get_binary_name) #Store output of get_binary_name here
     # Abort early if this processor is not supported (get_binary_name returns empty string)
     if [[ "${funcOutput}" == "" ]]; then
-        printf "  %b Upgrade/install aborted\\n" "${CROSS}" "${DISTRO_NAME}"
+        printf "  %b 升级/安装中止\\n" "${CROSS}" "${DISTRO_NAME}"
         exit 1
     fi
 
     if [[ "${fresh_install}" == false ]]; then
         # if it's running unattended,
         if [[ "${runUnattended}" == true ]]; then
-            printf "  %b Performing unattended setup, no dialogs will be displayed\\n" "${INFO}"
+            printf "  %b 正在执行无人值守设置，不会显示对话框\\n" "${INFO}"
             # also disable debconf-apt-progress dialogs
             export DEBIAN_FRONTEND="noninteractive"
         fi
@@ -2373,7 +2373,7 @@ main() {
     local theRest
     theRest="${funcOutput%pihole-FTL*}" # Print the rest of get_binary_name's output to display (cut out from first instance of "pihole-FTL")
     if ! FTLdetect "${binary}" "${theRest}"; then
-        printf "  %b FTL Engine not installed\\n" "${CROSS}"
+        printf "  %b FTL 引擎未安装\\n" "${CROSS}"
         exit 1
     fi
 
@@ -2385,7 +2385,7 @@ main() {
         # shellcheck source="./advanced/Scripts/utils.sh"
         source "${PI_HOLE_INSTALL_DIR}/utils.sh"
     else
-        printf "  %b Failure: /opt/pihole/utils.sh does not exist .\\n" "${CROSS}"
+        printf "  %b 失败：/opt/pihole/utils.sh 不存在。\\n" "${CROSS}"
         exit 1
     fi
 
@@ -2411,14 +2411,13 @@ main() {
     disable_resolved_stublistener
 
     if [[ "${fresh_install}" == false ]]; then
-        # Check if gravity database needs to be upgraded. If so, do it without rebuilding
-        # gravity altogether. This may be a very long running task needlessly blocking
-        # the update process.
-        # Only do this on updates, not on fresh installs as the database does not exit yet
+        # 检查 gravity 数据库是否需要升级。如果是，请在不完全重建 gravity 的情况下执行此操作。
+        # 这可能是一个非常耗时的任务，无需阻止更新过程。
+        # 仅在更新时执行此操作，不在全新安装时执行，因为数据库尚不存在
         /opt/pihole/gravity.sh --upgrade
     fi
 
-    printf "  %b Restarting services...\\n" "${INFO}"
+    printf "  %b 正在重启服务...\\n" "${INFO}"
     # Start services
 
     # Enable FTL
@@ -2471,38 +2470,38 @@ main() {
         pihole setpassword "${pw}" > /dev/null
 
         # Explain to the user how to use Pi-hole as their DNS server
-        printf "\\n  %b You may now configure your devices to use the Pi-hole as their DNS server\\n" "${INFO}"
-        [[ -n "${IPV4_ADDRESS%/*}" ]] && printf "  %b Pi-hole DNS (IPv4): %s\\n" "${INFO}" "${IPV4_ADDRESS%/*}"
-        [[ -n "${IPV6_ADDRESS}" ]] && printf "  %b Pi-hole DNS (IPv6): %s\\n" "${INFO}" "${IPV6_ADDRESS}"
-        printf "  %b If you have not done so already, the above IP should be set to static.\\n" "${INFO}"
+        printf "\\n  %b 您现在可以将设备配置为使用 Pi-hole 作为其 DNS 服务器\\n" "${INFO}"
+        [[ -n "${IPV4_ADDRESS%/*}" ]] && printf "  %b Pi-hole DNS (IPv4)：%s\\n" "${INFO}" "${IPV4_ADDRESS%/*}"
+        [[ -n "${IPV6_ADDRESS}" ]] && printf "  %b Pi-hole DNS (IPv6)：%s\\n" "${INFO}" "${IPV6_ADDRESS}"
+        printf "  %b 如果您还没有这样做，上面的 IP 应该设置为静态。\\n" "${INFO}"
 
-        printf "  %b View the web interface at http://pi.hole:${WEBPORT}/admin or http://%s/admin\\n\\n" "${INFO}" "${IPV4_ADDRESS%/*}:${WEBPORT}"
-        printf "  %b Web Interface password: %b%s%b\\n" "${INFO}" "${COL_GREEN}" "${pw}" "${COL_NC}"
-        printf "  %b This can be changed using 'pihole setpassword'\\n\\n" "${INFO}"
-        printf "  %b To allow your user to use all CLI functions without authentication, refer to\\n" "${INFO}"
-        printf "    our documentation at: https://docs.pi-hole.net/main/post-install/\\n\\n"
+        printf "  %b 在 http://pi.hole:${WEBPORT}/admin 或 http://%s/admin 查看 Web 界面\\n\\n" "${INFO}" "${IPV4_ADDRESS%/*}:${WEBPORT}"
+        printf "  %b Web 界面密码：%b%s%b\\n" "${INFO}" "${COL_GREEN}" "${pw}" "${COL_NC}"
+        printf "  %b 可以使用 'pihole setpassword' 更改此密码\\n\\n" "${INFO}"
+        printf "  %b 要允许您的用户无需身份验证即可使用所有 CLI 功能，请参阅\\n" "${INFO}"
+        printf "    我们的文档：https://docs.pi-hole.net/main/post-install/\\n\\n"
 
         # Final dialog message to the user
         dialog --no-shadow --keep-tite \
-            --title "Installation Complete!" \
-            --msgbox "Configure your devices to use the Pi-hole as their DNS server using:\
+            --title "安装完成！" \
+            --msgbox "配置您的设备使用 Pi-hole 作为其 DNS 服务器，使用：\
 \\n\\nIPv4:	${IPV4_ADDRESS%/*}\
-\\nIPv6:	${IPV6_ADDRESS:-"Not Configured"}\
-\\nIf you have not done so already, the above IP should be set to static.\
-\\nView the web interface at http://pi.hole:${WEBPORT}/admin or http://${IPV4_ADDRESS%/*}:${WEBPORT}/admin\\n\\nYour Admin Webpage login password is ${pw}\
+\\nIPv6:	${IPV6_ADDRESS:-"未配置"}\
+\\n如果您还没有这样做，上面的 IP 应该设置为静态。\
+\\n在 http://pi.hole:${WEBPORT}/admin 或 http://${IPV4_ADDRESS%/*}:${WEBPORT}/admin 查看 Web 界面\\n\\n您的管理员网页登录密码是 ${pw}\
 \\n
 \\n
-\\nTo allow your user to use all CLI functions without authentication,\
-\\nrefer to https://docs.pi-hole.net/main/post-install/" "${r}" "${c}"
+\\n要允许您的用户无需身份验证即可使用所有 CLI 功能，\
+\\n请参阅 https://docs.pi-hole.net/main/post-install/" "${r}" "${c}"
 
-        INSTALL_TYPE="Installation"
+        INSTALL_TYPE="安装"
     else
-        INSTALL_TYPE="Update"
+        INSTALL_TYPE="更新"
     fi
 
     # Display where the log file is
-    printf "\\n  %b The install log is located at: %s\\n" "${INFO}" "${installLogLoc}"
-    printf "  %b %b%s complete! %b\\n" "${TICK}" "${COL_GREEN}" "${INSTALL_TYPE}" "${COL_NC}"
+    printf "\\n  %b 安装日志位于：%s\\n" "${INFO}" "${installLogLoc}"
+    printf "  %b %b%s 完成！ %b\\n" "${TICK}" "${COL_GREEN}" "${INSTALL_TYPE}" "${COL_NC}"
 
     if [[ "${INSTALL_TYPE}" == "Update" ]]; then
         printf "\\n"

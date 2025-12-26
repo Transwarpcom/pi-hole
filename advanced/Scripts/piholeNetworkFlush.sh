@@ -27,7 +27,7 @@ source "${utilsfile}"
 flushNetwork(){
     local output
 
-    echo -ne "  ${INFO} Flushing network table ..."
+    echo -ne "  ${INFO} 正在刷新网络表 ..."
 
     local data status error
     # Authenticate with FTL
@@ -44,12 +44,12 @@ flushNetwork(){
     local error
     error=$(jq --compact-output <<< "${data}" '.error')
     if [[ $error != "null" && $error != "" ]]; then
-        echo -e "${OVER}  ${CROSS} Failed to flush the network table:"
+        echo -e "${OVER}  ${CROSS} 刷新网络表失败："
         echo -e "      $(jq <<< "${data}" '.error')"
         LogoutAPI
         exit 1
     elif [[ "${status}" == "200" ]]; then
-        echo -e "${OVER}  ${TICK} Flushed network table"
+        echo -e "${OVER}  ${TICK} 已刷新网络表"
     fi
 
     # Delete session
@@ -59,8 +59,8 @@ flushNetwork(){
 flushArp(){
     # Flush ARP cache of the host
     if ! output=$(ip -s -s neigh flush all 2>&1); then
-        echo -e "${OVER}  ${CROSS} Failed to flush ARP cache"
-        echo "  Output: ${output}"
+        echo -e "${OVER}  ${CROSS} 刷新 ARP 缓存失败"
+        echo "  输出: ${output}"
         return 1
     fi
 }
@@ -76,9 +76,9 @@ done
 flushNetwork
 
 if [[ "${doARP}" == true ]]; then
-    echo -ne "  ${INFO} Flushing ARP cache"
+    echo -ne "  ${INFO} 正在刷新 ARP 缓存"
     if flushArp; then
-        echo -e "${OVER}  ${TICK} Flushed ARP cache"
+        echo -e "${OVER}  ${TICK} 已刷新 ARP 缓存"
     fi
 fi
 

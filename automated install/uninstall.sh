@@ -15,21 +15,21 @@ source "/opt/pihole/utils.sh"
 # getFTLConfigValue() from utils.sh
 
 while true; do
-    read -rp "  ${QST} Are you sure you would like to remove ${COL_BOLD}Pi-hole${COL_NC}? [y/N] " answer
+    read -rp "  ${QST} 您确定要移除 ${COL_BOLD}Pi-hole${COL_NC} 吗？ [y/N] " answer
     case ${answer} in
         [Yy]* ) break;;
-        * ) echo -e "${OVER}  ${COL_GREEN}Uninstall has been canceled${COL_NC}"; exit 0;;
+        * ) echo -e "${OVER}  ${COL_GREEN}卸载已取消${COL_NC}"; exit 0;;
     esac
 done
 
 # Must be root to uninstall
-str="Root user check"
+str="Root 用户检查"
 if [[ ${EUID} -eq 0 ]]; then
     echo -e "  ${TICK} ${str}"
 else
     echo -e "  ${CROSS} ${str}
-        Script called with non-root privileges
-        The Pi-hole requires elevated privileges to uninstall"
+        脚本以非 root 权限调用
+        卸载 Pi-hole 需要提升的权限"
     exit 1
 fi
 
@@ -56,16 +56,16 @@ source "${PI_HOLE_LOCAL_REPO}/automated install/basic-install.sh"
 removeMetaPackage() {
     # Purge Pi-hole meta package
     echo ""
-    echo -ne "  ${INFO} Removing Pi-hole meta package...";
+    echo -ne "  ${INFO} 正在移除 Pi-hole 元数据包...";
     eval "${PKG_REMOVE}" "pihole-meta" &> /dev/null;
-    echo -e "${OVER}  ${INFO} Removed Pi-hole meta package";
+    echo -e "${OVER}  ${INFO} 已移除 Pi-hole 元数据包";
 }
 
 removeWebInterface() {
     # Remove the web interface of Pi-hole
-    echo -ne "  ${INFO} Removing Web Interface..."
+    echo -ne "  ${INFO} 正在移除 Web 界面..."
     rm -rf "${ADMIN_INTERFACE_DIR:-/var/www/html/admin/}" &> /dev/null
-    echo -e "${OVER}  ${TICK} Removed Web Interface"
+    echo -e "${OVER}  ${TICK} 已移除 Web 界面"
 }
 
 removeFTL() {
@@ -75,28 +75,28 @@ removeFTL() {
         stop_service pihole-FTL
         disable_service pihole-FTL
 
-        echo -ne "  ${INFO} Removing pihole-FTL..."
+        echo -ne "  ${INFO} 正在移除 pihole-FTL..."
         rm -f /etc/systemd/system/pihole-FTL.service &> /dev/null
         if [[ -d '/etc/systemd/system/pihole-FTL.service.d' ]]; then
-            read -rp "  ${QST} FTL service override directory /etc/systemd/system/pihole-FTL.service.d detected. Do you wish to remove this from your system? [y/N] " answer
+            read -rp "  ${QST} 检测到 FTL 服务覆盖目录 /etc/systemd/system/pihole-FTL.service.d。您希望从系统中移除它吗？ [y/N] " answer
             case $answer in
                 [yY]*)
-                    echo -ne "  ${INFO} Removing /etc/systemd/system/pihole-FTL.service.d..."
+                    echo -ne "  ${INFO} 正在移除 /etc/systemd/system/pihole-FTL.service.d..."
                     rm -R /etc/systemd/system/pihole-FTL.service.d &> /dev/null
-                    echo -e "${OVER}  ${INFO} Removed /etc/systemd/system/pihole-FTL.service.d"
+                    echo -e "${OVER}  ${INFO} 已移除 /etc/systemd/system/pihole-FTL.service.d"
                 ;;
-                *) echo -e "  ${INFO} Leaving /etc/systemd/system/pihole-FTL.service.d in place.";;
+                *) echo -e "  ${INFO} 保留 /etc/systemd/system/pihole-FTL.service.d。";;
             esac
         fi
         rm -f /etc/init.d/pihole-FTL &> /dev/null
         rm -f /usr/bin/pihole-FTL &> /dev/null
-        echo -e "${OVER}  ${TICK} Removed pihole-FTL"
+        echo -e "${OVER}  ${TICK} 已移除 pihole-FTL"
 
         # Force systemd reload after service files are removed
         if is_command "systemctl"; then
-            echo -ne "  ${INFO} Restarting systemd..."
+            echo -ne "  ${INFO} 正在重启 systemd..."
             systemctl daemon-reload
-            echo -e "${OVER}  ${TICK} Restarted systemd..."
+            echo -e "${OVER}  ${TICK} 已重启 systemd..."
         fi
     fi
 }
@@ -110,14 +110,14 @@ removeCronFiles() {
         mv /etc/crontab /etc/crontab.pihole
         mv /etc/crontab.orig /etc/crontab
         restart_service cron
-        echo -e "  ${TICK} Restored the default system cron"
-        echo -e "  ${INFO} A backup of the most recent crontab is saved at /etc/crontab.pihole"
+        echo -e "  ${TICK} 恢复了默认的系统 cron"
+        echo -e "  ${INFO} 最近 crontab 的备份保存在 /etc/crontab.pihole"
     fi
 
     # Attempt to preserve backwards compatibility with older versions
     if [[ -f /etc/cron.d/pihole ]];then
         rm -f /etc/cron.d/pihole &> /dev/null
-        echo -e "  ${TICK} Removed /etc/cron.d/pihole"
+        echo -e "  ${TICK} 已移除 /etc/cron.d/pihole"
     fi
 }
 
@@ -155,7 +155,7 @@ removePiholeFiles() {
     # Remove pihole from sudoers for compatibility with old versions
     rm -f /etc/sudoers.d/pihole &> /dev/null
 
-    echo -e "  ${TICK} Removed config files"
+    echo -e "  ${TICK} 已移除配置文件"
 }
 
 removeManPage() {
@@ -166,7 +166,7 @@ removeManPage() {
         if is_command "mandb"; then
             mandb -q &>/dev/null
         fi
-        echo -e "  ${TICK} Removed pihole man page"
+        echo -e "  ${TICK} 已移除 pihole 手册页"
     fi
 }
 
@@ -174,18 +174,18 @@ removeUser() {
     # If the pihole user exists, then remove
     if id "pihole" &> /dev/null; then
         if userdel -r pihole 2> /dev/null; then
-            echo -e "  ${TICK} Removed 'pihole' user"
+            echo -e "  ${TICK} 已移除 'pihole' 用户"
         else
-            echo -e "  ${CROSS} Unable to remove 'pihole' user"
+            echo -e "  ${CROSS} 无法移除 'pihole' 用户"
         fi
     fi
 
     # If the pihole group exists, then remove
     if getent group "pihole" &> /dev/null; then
         if groupdel pihole 2> /dev/null; then
-            echo -e "  ${TICK} Removed 'pihole' group"
+            echo -e "  ${TICK} 已移除 'pihole' 组"
         else
-            echo -e "  ${CROSS} Unable to remove 'pihole' group"
+            echo -e "  ${CROSS} 无法移除 'pihole' 组"
         fi
     fi
 }
@@ -200,13 +200,13 @@ restoreResolved() {
 }
 
 completionMessage() {
-    echo -e "\\n   We're sorry to see you go, but thanks for checking out Pi-hole!
-       If you need help, reach out to us on GitHub, Discourse, Reddit or Twitter
-       Reinstall at any time: ${COL_BOLD}curl -sSL https://install.pi-hole.net | bash${COL_NC}
+    echo -e "\\n   很遗憾看到您离开，但感谢您试用 Pi-hole！
+       如果您需要帮助，请在 GitHub、Discourse、Reddit 或 Twitter 上联系我们
+       随时重新安装：${COL_BOLD}curl -sSL https://install.pi-hole.net | bash${COL_NC}
 
-      ${COL_RED}Please reset the DNS on your router/clients to restore internet connectivity${COL_NC}
-      ${INFO} Pi-hole's meta package has been removed, use the 'autoremove' function from your package manager to remove unused dependencies${COL_NC}
-      ${COL_GREEN}Uninstallation Complete! ${COL_NC}"
+      ${COL_RED}请重置路由器/客户端上的 DNS 以恢复互联网连接${COL_NC}
+      ${INFO} Pi-hole 的元数据包已移除，使用包管理器的 'autoremove' 功能来移除未使用的依赖项${COL_NC}
+      ${COL_GREEN}卸载完成！${COL_NC}"
 }
 
 ######### SCRIPT ###########

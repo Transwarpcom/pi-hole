@@ -36,13 +36,13 @@ TestAPIAvailability() {
 
     # If the query was not successful, the variable is empty
     if [ -z "${chaos_api_list}" ]; then
-        echo "API not available. Please check connectivity"
+        echo "API 不可用。请检查连接"
         exit 1
     fi
 
     # If an error occurred, the variable starts with ;;
     if [ "${chaos_api_list#;;}" != "${chaos_api_list}" ]; then
-        echo "Communication error. Is FTL running?"
+        echo "通信错误。FTL 正在运行吗？"
         exit 1
     fi
 
@@ -97,8 +97,8 @@ TestAPIAvailability() {
 
     # if apiAvailable is false, no working API was found
     if [ "${apiAvailable}" = false ]; then
-        echo "API not available. Please check FTL.log"
-        echo "Exiting."
+        echo "API 不可用。请检查 FTL.log"
+        echo "正在退出。"
         exit 1
     fi
 }
@@ -112,7 +112,7 @@ LoginAPI() {
     # Exit early if authentication is not needed
     if [ "${needAuth}" = false ]; then
         if [ "${1}" = "verbose" ]; then
-            echo "API Authentication: Not needed"
+            echo "API 认证：不需要"
         fi
         return
     fi
@@ -122,26 +122,26 @@ LoginAPI() {
         password=$(cat /etc/pihole/cli_pw)
 
         if [ "${1}" = "verbose" ]; then
-            echo "API Authentication: Trying to use CLI password"
+            echo "API 认证：尝试使用 CLI 密码"
         fi
 
         # If we can read the CLI password, we can skip 2FA even when it's required otherwise
         needTOTP=false
     elif [ "${1}" = "verbose" ]; then
-        echo "API Authentication: CLI password not available"
+        echo "API 认证：CLI 密码不可用"
     fi
 
     if [ -z "${password}" ]; then
         # no password read from CLI file
-        echo "Please enter your password:"
+        echo "请输入您的密码："
         # secretly read the password
         secretRead; printf '\n'
     fi
 
     if [ "${needTOTP}" = true ]; then
         # 2FA required
-        echo "Please enter the correct second factor."
-        echo "(Can be any number if you used the app password)"
+        echo "请输入正确的双重验证码。"
+        echo "（如果您使用的是应用密码，可以是任何数字）"
         read -r totp
     fi
 
@@ -153,27 +153,27 @@ LoginAPI() {
 
         # Print the error message if there is one
         if  [ ! "${sessionError}" = "null"  ] && [ "${1}" = "verbose" ]; then
-            echo "Error: ${sessionError}"
+            echo "错误：${sessionError}"
         fi
         # Print the session message if there is one
         if  [ ! "${sessionMessage}" = "null" ] && [ "${1}" = "verbose" ]; then
-            echo "Error: ${sessionMessage}"
+            echo "错误：${sessionMessage}"
         fi
 
         if  [ "${1}" = "verbose" ]; then
             # If we are not in verbose mode, no need to print the error message again
-            echo "Please enter your Pi-hole password"
+            echo "请输入您的 Pi-hole 密码"
         else
 
-            echo "Authentication failed. Please enter your Pi-hole password"
+            echo "认证失败。请输入您的 Pi-hole 密码"
         fi
 
         # secretly read the password
         secretRead; printf '\n'
 
         if [ "${needTOTP}" = true ]; then
-            echo "Please enter the correct second factor:"
-            echo "(Can be any number if you used the app password)"
+            echo "请输入正确的双重验证码："
+            echo "（如果您使用的是应用密码，可以是任何数字）"
             read -r totp
         fi
 
@@ -187,7 +187,7 @@ Authentication() {
     sessionResponse="$(curl --connect-timeout 2 -skS -X POST "${API_URL}auth" --user-agent "Pi-hole cli" --data "{\"password\":\"${password}\", \"totp\":${totp:-null}}" )"
 
     if [ -z "${sessionResponse}" ]; then
-        echo "No response from FTL server. Please check connectivity"
+        echo "FTL 服务器无响应。请检查连接"
         exit 1
     fi
 
@@ -207,9 +207,9 @@ Authentication() {
 
     if [ "${1}" = "verbose" ]; then
         if [ "${validSession}" = true ]; then
-            echo "API Authentication: ${COL_GREEN}Success${COL_NC}"
+            echo "API 认证：${COL_GREEN}成功${COL_NC}"
         else
-            echo "API Authentication: ${COL_RED}Failed${COL_NC}"
+            echo "API 认证：${COL_RED}失败${COL_NC}"
         fi
     fi
 }
@@ -222,11 +222,11 @@ LogoutAPI() {
         deleteResponse=$(curl -skS -o /dev/null -w "%{http_code}" -X DELETE "${API_URL}auth"  -H "Accept: application/json" -H "sid: ${SID}")
 
         case "${deleteResponse}" in
-            "401") echo "Logout attempt without a valid session. Unauthorized!";;
-            "204") if [ "${1}" = "verbose" ]; then echo "API Logout: ${COL_GREEN}Success${COL_NC} (session deleted)"; fi;;
+            "401") echo "在没有有效会话的情况下尝试注销。未授权！";;
+            "204") if [ "${1}" = "verbose" ]; then echo "API 注销：${COL_GREEN}成功${COL_NC} (会话已删除)"; fi;;
         esac;
     elif [ "${1}" = "verbose" ]; then
-        echo "API Logout: ${COL_GREEN}Success${COL_NC} (no valid session)"
+        echo "API 注销：${COL_GREEN}成功${COL_NC} (无有效会话)"
     fi
 }
 

@@ -95,10 +95,10 @@ setFTLConfigValue(){
     0) ;;
     5)
         # FTL returns 5 if the value was set by an environment variable and is therefore read-only
-        printf "  %s %s set by environment variable. Please unset it to use this function\n" "${CROSS}" "${1}";
+        printf "  %s %s 由环境变量设置。请取消设置以使用此功能\n" "${CROSS}" "${1}";
         exit 5;;
     *)
-        printf "  %s Failed to set %s. Try with sudo power\n" "${CROSS}" "${1}"
+        printf "  %s 设置 %s 失败。尝试使用 sudo 权限\n" "${CROSS}" "${1}"
         exit 1
     esac
 }

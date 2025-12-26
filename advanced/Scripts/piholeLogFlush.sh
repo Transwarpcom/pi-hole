@@ -51,13 +51,13 @@ rotate_log() {
     # moved file (it will have the same file handler)
     local logfile="$1"
     if [[ "$*" != *"quiet"* ]]; then
-        echo -ne "  ${INFO} Rotating ${logfile} ..."
+        echo -ne "  ${INFO} 轮转 ${logfile} ..."
     fi
     cp -p "${logfile}" "${logfile}.1"
     echo " " > "${logfile}"
     chmod 640 "${logfile}"
     if [[ "$*" != *"quiet"* ]]; then
-        echo -e "${OVER}  ${TICK} Rotated ${logfile} ..."
+        echo -e "${OVER}  ${TICK} 已轮转 ${logfile} ..."
     fi
 }
 
@@ -65,7 +65,7 @@ rotate_log() {
 flush_log() {
     local logfile="$1"
     if [[ "$*" != *"quiet"* ]]; then
-        echo -ne "  ${INFO} Flushing ${logfile} ..."
+        echo -ne "  ${INFO} 刷新 ${logfile} ..."
     fi
     echo " " > "${logfile}"
     chmod 640 "${logfile}"
@@ -74,7 +74,7 @@ flush_log() {
         chmod 640 "${logfile}.1"
     fi
     if [[ "$*" != *"quiet"* ]]; then
-        echo -e "${OVER}  ${TICK} Flushed ${logfile} ..."
+        echo -e "${OVER}  ${TICK} 已刷新 ${logfile} ..."
     fi
 }
 
@@ -84,7 +84,7 @@ if [[ "$*" == *"once"* ]]; then
         # Logrotate once
 
         if [[ "$*" != *"quiet"* ]]; then
-            echo -ne "  ${INFO} Running logrotate ..."
+            echo -ne "  ${INFO} 正在运行 logrotate ..."
         fi
         mkdir -p "${STATEFILE%/*}"
         /usr/sbin/logrotate --force --state "${STATEFILE}" /etc/pihole/logrotate
@@ -101,7 +101,7 @@ else
     flush_log "${WEBFILE}"
 
     if [[ "$*" != *"quiet"* ]]; then
-        echo -ne "  ${INFO} Flushing database, DNS resolution temporarily unavailable ..."
+        echo -ne "  ${INFO} 正在刷新数据库，DNS 解析暂时不可用 ..."
     fi
 
     # Stop FTL to make sure it doesn't write to the database while we're deleting data
@@ -113,6 +113,6 @@ else
     # Restart FTL
     service pihole-FTL restart
     if [[ "$*" != *"quiet"* ]]; then
-        echo -e "${OVER}  ${TICK} Deleted ${deleted} queries from long-term query database"
+        echo -e "${OVER}  ${TICK} 从长期查询数据库中删除了 ${deleted} 条查询"
     fi
 fi

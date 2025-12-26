@@ -2101,7 +2101,7 @@ FTLcheckUpdate() {
                 # check the installed sha1sum of the binary vs the remote
                 # sha1sum. If they do not match, then download
                 printf "  %b Latest FTL binary already installed (%s), verifying integrity...\\n" "${INFO}" "${FTLlatesttag}"
-                checkSumFile="https://github.com/Transwarpcom/FTL/releases/download/${FTLversion%$'\r'}/${binary}.sha1"
+                checkSumFile="https://github.com/pi-hole/FTL/releases/download/${FTLversion%$'\r'}/${binary}.sha1"
                 # Continue further down...
             fi
         else

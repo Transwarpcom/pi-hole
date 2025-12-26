@@ -79,12 +79,12 @@ webroot="/var/www/html"
 # Pi-hole contains various setup scripts and files which are critical to the installation.
 # Search for "PI_HOLE_LOCAL_REPO" in this file to see all such scripts.
 # Two notable scripts are gravity.sh (used to generate the HOSTS file) and advanced/Scripts/webpage.sh (used to install the Web admin interface)
-webInterfaceGitUrl="https://github.com/pi-hole/web.git"
+webInterfaceGitUrl="https://github.com/Transwarpcom/web.git"
 webInterfaceDir="${webroot}/admin"
-piholeGitUrl="https://github.com/pi-hole/pi-hole.git"
+piholeGitUrl="https://github.com/Transwarpcom/pi-hole.git"
 PI_HOLE_LOCAL_REPO="/etc/.pihole"
 # List of pihole scripts, stored in an array
-PI_HOLE_FILES=(list piholeDebug piholeLogFlush setupLCD update version gravity uninstall webpage)
+PI_HOLE_FILES=(list piholeDebug piholeLogFlush setupLCD update version gravity uninstall webpage localize_web)
 # This directory is where the Pi-hole scripts will be installed
 PI_HOLE_INSTALL_DIR="/opt/pihole"
 PI_HOLE_CONFIG_DIR="/etc/pihole"
@@ -1651,6 +1651,11 @@ installPihole() {
         exit 1
     fi
 
+    # Apply Web UI Localization if available
+    if [ -f "/opt/pihole/localize_web.sh" ]; then
+        /opt/pihole/localize_web.sh "${webInterfaceDir}" || true
+    fi
+
     # Move old dnsmasq files to $V6_CONF_MIGRATION_DIR for later migration via migrate_dnsmasq_configs()
     move_old_dnsmasq_ftl_configs
     remove_old_pihole_lighttpd_configs
@@ -1836,10 +1841,6 @@ clone_or_reset_repos() {
             }
     fi
 
-    # Apply Web UI Localization if available
-    if [ -f "/opt/pihole/localize_web.sh" ]; then
-        /opt/pihole/localize_web.sh "${webInterfaceDir}" || true
-    fi
 }
 
 # Download FTL binary to random temp directory and install FTL binary
@@ -2082,7 +2083,7 @@ FTLcheckUpdate() {
 
             # Get the latest version from the GitHub API
             local FTLlatesttag
-            FTLlatesttag=$(curl -s https://api.github.com/repos/pi-hole/FTL/releases/latest | jq -sRr 'fromjson? | .tag_name | values')
+            FTLlatesttag=$(curl -s https://api.github.com/repos/Transwarpcom/FTL/releases/latest | jq -sRr 'fromjson? | .tag_name | values')
 
             if [ -z "${FTLlatesttag}" ]; then
                 # There was an issue while retrieving the latest version
@@ -2100,7 +2101,7 @@ FTLcheckUpdate() {
                 # check the installed sha1sum of the binary vs the remote
                 # sha1sum. If they do not match, then download
                 printf "  %b Latest FTL binary already installed (%s), verifying integrity...\\n" "${INFO}" "${FTLlatesttag}"
-                checkSumFile="https://github.com/pi-hole/FTL/releases/download/${FTLversion%$'\r'}/${binary}.sha1"
+                checkSumFile="https://github.com/Transwarpcom/FTL/releases/download/${FTLversion%$'\r'}/${binary}.sha1"
                 # Continue further down...
             fi
         else

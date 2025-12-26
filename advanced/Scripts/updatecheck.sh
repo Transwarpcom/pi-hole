@@ -28,14 +28,14 @@ function get_local_hash() {
 function get_remote_version() {
     # if ${2} is = "master" we need to use the "latest" endpoint, otherwise, we simply return null
     if [[ "${2}" == "master" ]]; then
-        curl -s "https://api.github.com/repos/pi-hole/${1}/releases/latest" 2>/dev/null | jq --raw-output .tag_name || return 1
+        curl -s "https://api.github.com/repos/Transwarpcom/${1}/releases/latest" 2>/dev/null | jq --raw-output .tag_name || return 1
     else
         echo "null"
     fi
 }
 
 function get_remote_hash() {
-    git ls-remote "https://github.com/pi-hole/${1}" --tags "${2}" | awk '{print substr($0, 1,8);}' || return 1
+    git ls-remote "https://github.com/Transwarpcom/${1}" --tags "${2}" | awk '{print substr($0, 1,8);}' || return 1
 }
 
 # Source the utils file for addOrEditKeyValPair()

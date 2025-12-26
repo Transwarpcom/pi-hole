@@ -168,7 +168,7 @@ checkout() {
 
         # Check if requested branch is available
         echo -e "  ${INFO} 正在检查 GitHub 上分支 ${COL_CYAN}${2}${COL_NC} 的可用性"
-        mapfile -t ftlbranches < <(git ls-remote https://github.com/pi-hole/ftl | grep "refs/heads" | cut -d'/' -f3- -)
+        mapfile -t ftlbranches < <(git ls-remote https://github.com/Transwarpcom/ftl | grep "refs/heads" | cut -d'/' -f3- -)
         # If returned array is empty -> connectivity issue
         if [[ ${#ftlbranches[@]} -eq 0 ]]; then
             echo -e "  ${CROSS} 无法从 GitHub 获取分支。请检查您的互联网连接并稍后重试。"

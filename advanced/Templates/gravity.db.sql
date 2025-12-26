@@ -10,7 +10,7 @@ CREATE TABLE "group"
     date_modified INTEGER NOT NULL DEFAULT (cast(strftime('%s', 'now') as int)),
     description TEXT
 );
-INSERT INTO "group" (id,enabled,name,description) VALUES (0,1,'Default','The default group');
+INSERT INTO "group" (id,enabled,name,description) VALUES (0,1,'Default','默认组');
 
 CREATE TABLE domainlist
 (

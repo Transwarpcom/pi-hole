@@ -44,16 +44,16 @@ colfile="/opt/pihole/COL_TABLE"
 source ${colfile}
 
 helpFunc() {
-    echo "Usage: pihole ${abbrv} [options] <domain> <domain2 ...>
-Example: 'pihole ${abbrv} site.com', or 'pihole ${abbrv} site1.com site2.com'
-${typeId^} one or more ${kindId} domains
+    echo "用法：pihole ${abbrv} [options] <domain> <domain2 ...>
+示例：'pihole ${abbrv} site.com', 或 'pihole ${abbrv} site1.com site2.com'
+${typeId^} 一个或多个 ${kindId} 域名
 
-Options:
-  remove, delete, -d  Remove domain(s)
-  -q, --quiet         Make output less verbose
-  -h, --help          Show this help dialog
-  -l, --list          Display domains
-  --comment \"text\"    Add a comment to the domain. If adding multiple domains the same comment will be used for all"
+选项：
+  remove, delete, -d  移除域名
+  -q, --quiet         减少输出信息
+  -h, --help          显示此帮助对话框
+  -l, --list          显示域名
+  --comment \"text\"    为域名添加注释。如果添加多个域名，所有域名将使用相同的注释"
 
   exit 0
 }
@@ -90,7 +90,7 @@ AddDomain() {
     # (they are listed in .processed.success, use jq)
     num=$(echo "${data}" | jq '.processed.success | length')
     if [[ "${num}" -gt 0 ]] && [[ "${verbose}" == true ]]; then
-        echo -e "  ${TICK} Added ${num} domain(s):"
+        echo -e "  ${TICK} 已添加 ${num} 个域名："
         for i in $(seq 0 $((num-1))); do
             echo -e "    - ${COL_BLUE}$(echo "${data}" | jq --raw-output ".processed.success[$i].item")${COL_NC}"
         done
@@ -99,12 +99,12 @@ AddDomain() {
     # (they are listed in .processed.errors, use jq)
     num=$(echo "${data}" | jq '.processed.errors | length')
     if [[ "${num}" -gt 0 ]] && [[ "${verbose}" == true ]]; then
-        echo -e "  ${CROSS} Failed to add ${num} domain(s):"
+        echo -e "  ${CROSS} 添加 ${num} 个域名失败："
         for i in $(seq 0 $((num-1))); do
             echo -e "    - ${COL_BLUE}$(echo "${data}" | jq --raw-output ".processed.errors[$i].item")${COL_NC}"
             error=$(echo "${data}" | jq --raw-output ".processed.errors[$i].error")
             if [[ "${error}" == "UNIQUE constraint failed: domainlist.domain, domainlist.type" ]]; then
-                error="Domain already in the specified list"
+                error="域名已存在于指定列表中"
             fi
             echo -e "      ${error}"
         done
@@ -141,12 +141,12 @@ RemoveDomain() {
     local error
     error=$(jq --compact-output <<< "${data}" '.error')
     if [[ $error != "null" && $error != "" ]]; then
-        echo -e "  ${CROSS} Failed to remove domain(s):"
+        echo -e "  ${CROSS} 移除域名失败："
         echo -e "      $(jq <<< "${data}" '.error')"
     elif [[ "${verbose}" == true && "${status}" == "204" ]]; then
-        echo -e "  ${TICK} Domain(s) removed from the ${kindId} ${typeId}list"
+        echo -e "  ${TICK} 域名已从 ${kindId} ${typeId}列表 中移除"
     elif [[ "${verbose}" == true && "${status}" == "404" ]]; then
-        echo -e "  ${TICK} Requested domain(s) not found on ${kindId} ${typeId}list"
+        echo -e "  ${TICK} 在 ${kindId} ${typeId}列表 中未找到请求的域名"
     fi
 
     # Log out
@@ -158,7 +158,7 @@ Displaylist() {
 
     # if either typeId or kindId is empty, we cannot display the list
     if [[ -z "${typeId}" ]] || [[ -z "${kindId}" ]]; then
-        echo "  ${CROSS} Unable to display list. Please specify a list type and kind."
+        echo "  ${CROSS} 无法显示列表。请指定列表类型和种类。"
         exit 1
     fi
 
@@ -171,16 +171,16 @@ Displaylist() {
     # Display the list
     num=$(echo "${data}" | jq '.domains | length')
     if [[ "${num}" -gt 0 ]]; then
-        echo -e "  ${TICK} Found ${num} domain(s) in the ${kindId} ${typeId}list:"
+        echo -e "  ${TICK} 在 ${kindId} ${typeId}列表 中找到 ${num} 个域名："
         for i in $(seq 0 $((num-1))); do
             echo -e "    - ${COL_BLUE}$(echo "${data}" | jq --compact-output ".domains[$i].domain")${COL_NC}"
-            echo -e "      Comment: $(echo "${data}" | jq --compact-output ".domains[$i].comment")"
-            echo -e "      Groups: $(echo "${data}" | jq --compact-output ".domains[$i].groups")"
-            echo -e "      Added: $(date -d @"$(echo "${data}" | jq --compact-output ".domains[$i].date_added")")"
-            echo -e "      Last modified: $(date -d @"$(echo "${data}" | jq --compact-output ".domains[$i].date_modified")")"
+            echo -e "      注释：$(echo "${data}" | jq --compact-output ".domains[$i].comment")"
+            echo -e "      组：$(echo "${data}" | jq --compact-output ".domains[$i].groups")"
+            echo -e "      添加时间：$(date -d @"$(echo "${data}" | jq --compact-output ".domains[$i].date_added")")"
+            echo -e "      最后修改时间：$(date -d @"$(echo "${data}" | jq --compact-output ".domains[$i].date_modified")")"
         done
     else
-        echo -e "  ${INFO} No domains found in the ${kindId} ${typeId}list"
+        echo -e "  ${INFO} 在 ${kindId} ${typeId}列表 中未找到域名"
     fi
 
     # Log out
@@ -193,7 +193,7 @@ Displaylist() {
 GetComment() {
     comment="$1"
     if [[ "${comment}" =~ [^a-zA-Z0-9_\#:/\.,\ -] ]]; then
-        echo "  ${CROSS} Found invalid characters in domain comment!"
+        echo "  ${CROSS} 在域名注释中发现无效字符！"
         exit 1
     fi
 }

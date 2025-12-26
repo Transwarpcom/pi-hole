@@ -15,7 +15,7 @@ if [ -f ${cachedVersions} ]; then
     # shellcheck source=/dev/null
     . "$cachedVersions"
 else
-    echo "Could not find /etc/pihole/versions. Running update now."
+    echo "找不到 /etc/pihole/versions。正在运行更新。"
     pihole updatechecker
      # shellcheck source=/dev/null
     . "$cachedVersions"
@@ -32,22 +32,22 @@ main() {
     fi
 
     if [ "${details}" = true ]; then
-        echo "Core"
-        echo "    Version is ${CORE_VERSION:=N/A} (Latest: ${GITHUB_CORE_VERSION:=N/A})"
-        echo "    Branch is ${CORE_BRANCH:=N/A}"
-        echo "    Hash is ${CORE_HASH:=N/A} (Latest: ${GITHUB_CORE_HASH:=N/A})"
+        echo "核心"
+        echo "    版本是 ${CORE_VERSION:=N/A} (最新: ${GITHUB_CORE_VERSION:=N/A})"
+        echo "    分支是 ${CORE_BRANCH:=N/A}"
+        echo "    Hash 是 ${CORE_HASH:=N/A} (最新: ${GITHUB_CORE_HASH:=N/A})"
         echo "Web"
-        echo "    Version is ${WEB_VERSION:=N/A} (Latest: ${GITHUB_WEB_VERSION:=N/A})"
-        echo "    Branch is ${WEB_BRANCH:=N/A}"
-        echo "    Hash is ${WEB_HASH:=N/A} (Latest: ${GITHUB_WEB_HASH:=N/A})"
+        echo "    版本是 ${WEB_VERSION:=N/A} (最新: ${GITHUB_WEB_VERSION:=N/A})"
+        echo "    分支是 ${WEB_BRANCH:=N/A}"
+        echo "    Hash 是 ${WEB_HASH:=N/A} (最新: ${GITHUB_WEB_HASH:=N/A})"
         echo "FTL"
-        echo "    Version is ${FTL_VERSION:=N/A} (Latest: ${GITHUB_FTL_VERSION:=N/A})"
-        echo "    Branch is ${FTL_BRANCH:=N/A}"
-        echo "    Hash is ${FTL_HASH:=N/A} (Latest: ${GITHUB_FTL_HASH:=N/A})"
+        echo "    版本是 ${FTL_VERSION:=N/A} (最新: ${GITHUB_FTL_VERSION:=N/A})"
+        echo "    分支是 ${FTL_BRANCH:=N/A}"
+        echo "    Hash 是 ${FTL_HASH:=N/A} (最新: ${GITHUB_FTL_HASH:=N/A})"
     else
-        echo "Core version is ${CORE_VERSION:=N/A} (Latest: ${GITHUB_CORE_VERSION:=N/A})"
-        echo "Web version is ${WEB_VERSION:=N/A} (Latest: ${GITHUB_WEB_VERSION:=N/A})"
-        echo "FTL version is ${FTL_VERSION:=N/A} (Latest: ${GITHUB_FTL_VERSION:=N/A})"
+        echo "核心版本是 ${CORE_VERSION:=N/A} (最新: ${GITHUB_CORE_VERSION:=N/A})"
+        echo "Web 版本是 ${WEB_VERSION:=N/A} (最新: ${GITHUB_WEB_VERSION:=N/A})"
+        echo "FTL 版本是 ${FTL_VERSION:=N/A} (最新: ${GITHUB_FTL_VERSION:=N/A})"
     fi
 }
 

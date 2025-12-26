@@ -47,7 +47,7 @@ GitCheckUpdateAvail() {
 
     # Fetch latest changes in this repo
     if ! git fetch --quiet origin ; then
-        echo -e "\\n  ${COL_RED}Error: Unable to update local repository. Contact Pi-hole Support.${COL_NC}"
+        echo -e "\\n  ${COL_RED}错误：无法更新本地仓库。请联系 Pi-hole 支持。${COL_NC}"
         exit 1
     fi
 
@@ -76,14 +76,14 @@ GitCheckUpdateAvail() {
 
 
     if [[ "${#LOCAL}" == 0 ]]; then
-        echo -e "\\n  ${COL_RED}Error: Local revision could not be obtained, please contact Pi-hole Support"
-        echo -e "  Additional debugging output:${COL_NC}"
+        echo -e "\\n  ${COL_RED}错误：无法获取本地修订版，请联系 Pi-hole 支持"
+        echo -e "  额外的调试输出：${COL_NC}"
         git status
         exit 1
     fi
     if [[ "${#REMOTE}" == 0 ]]; then
-        echo -e "\\n  ${COL_RED}Error: Remote revision could not be obtained, please contact Pi-hole Support"
-        echo -e "  Additional debugging output:${COL_NC}"
+        echo -e "\\n  ${COL_RED}错误：无法获取远程修订版，请联系 Pi-hole 支持"
+        echo -e "  额外的调试输出：${COL_NC}"
         git status
         exit 1
     fi
@@ -103,7 +103,7 @@ GitCheckUpdateAvail() {
 }
 
 main() {
-    local basicError="\\n  ${COL_RED}Unable to complete update, please contact Pi-hole Support${COL_NC}"
+    local basicError="\\n  ${COL_RED}无法完成更新，请联系 Pi-hole 支持${COL_NC}"
     local core_update
     local web_update
     local FTL_update
@@ -120,33 +120,33 @@ main() {
 
     # This is unlikely
     if ! is_repo "${PI_HOLE_FILES_DIR}" ; then
-        echo -e "\\n  ${COL_RED}Error: Core Pi-hole repo is missing from system!"
-        echo -e "  Please re-run install script from https://pi-hole.net${COL_NC}"
+        echo -e "\\n  ${COL_RED}错误：系统缺少 Pi-hole 核心仓库！"
+        echo -e "  请从 https://pi-hole.net 重新运行安装脚本${COL_NC}"
         exit 1;
     fi
 
-    echo -e "  ${INFO} Checking for updates..."
+    echo -e "  ${INFO} 正在检查更新..."
 
     if GitCheckUpdateAvail "${PI_HOLE_FILES_DIR}" ; then
         core_update=true
-        echo -e "  ${INFO} Pi-hole Core:\\t${COL_YELLOW}update available${COL_NC}"
+        echo -e "  ${INFO} Pi-hole 核心：\\t${COL_YELLOW}有更新可用${COL_NC}"
     else
         core_update=false
-        echo -e "  ${INFO} Pi-hole Core:\\t${COL_GREEN}up to date${COL_NC}"
+        echo -e "  ${INFO} Pi-hole 核心：\\t${COL_GREEN}已是最新${COL_NC}"
     fi
 
     if ! is_repo "${ADMIN_INTERFACE_DIR}" ; then
-        echo -e "\\n  ${COL_RED}Error: Web Admin repo is missing from system!"
-        echo -e "  Please re-run install script from https://pi-hole.net${COL_NC}"
+        echo -e "\\n  ${COL_RED}错误：系统缺少 Web 管理仓库！"
+        echo -e "  请从 https://pi-hole.net 重新运行安装脚本${COL_NC}"
         exit 1;
     fi
 
     if GitCheckUpdateAvail "${ADMIN_INTERFACE_DIR}" ; then
         web_update=true
-        echo -e "  ${INFO} Web Interface:\\t${COL_YELLOW}update available${COL_NC}"
+        echo -e "  ${INFO} Web 界面：\\t${COL_YELLOW}有更新可用${COL_NC}"
     else
         web_update=false
-        echo -e "  ${INFO} Web Interface:\\t${COL_GREEN}up to date${COL_NC}"
+        echo -e "  ${INFO} Web 界面：\\t${COL_GREEN}已是最新${COL_NC}"
     fi
 
     local funcOutput
@@ -156,22 +156,22 @@ main() {
 
     if FTLcheckUpdate "${binary}" &>/dev/null; then
         FTL_update=true
-        echo -e "  ${INFO} FTL:\\t\\t${COL_YELLOW}update available${COL_NC}"
+        echo -e "  ${INFO} FTL：\\t\\t${COL_YELLOW}有更新可用${COL_NC}"
     else
         case $? in
             1)
-                echo -e "  ${INFO} FTL:\\t\\t${COL_GREEN}up to date${COL_NC}"
+                echo -e "  ${INFO} FTL：\\t\\t${COL_GREEN}已是最新${COL_NC}"
                 ;;
             2)
-                echo -e "  ${INFO} FTL:\\t\\t${COL_RED}Branch is not available.${COL_NC}\\n\\t\\t\\tUse ${COL_GREEN}pihole checkout ftl [branchname]${COL_NC} to switch to a valid branch."
+                echo -e "  ${INFO} FTL：\\t\\t${COL_RED}分支不可用。${COL_NC}\\n\\t\\t\\t使用 ${COL_GREEN}pihole checkout ftl [branchname]${COL_NC} 切换到有效分支。"
                 exit 1
                 ;;
             3)
-                echo -e "  ${INFO} FTL:\\t\\t${COL_RED}Something has gone wrong, cannot reach download server${COL_NC}"
+                echo -e "  ${INFO} FTL：\\t\\t${COL_RED}出错了，无法连接下载服务器${COL_NC}"
                 exit 1
                 ;;
             *)
-                echo -e "  ${INFO} FTL:\\t\\t${COL_RED}Something has gone wrong, contact support${COL_NC}"
+                echo -e "  ${INFO} FTL：\\t\\t${COL_RED}出错了，请联系支持${COL_NC}"
                 exit 1
         esac
         FTL_update=false
@@ -188,12 +188,12 @@ main() {
     if [[ ! "${ftlBranch}" == "master" && ! "${ftlBranch}" == "development" ]]; then
         # Notify user that they are on a custom branch which might mean they they are lost
         # behind if a branch was merged to development and got abandoned
-        printf "  %b %bWarning:%b You are using FTL from a custom branch (%s) and might be missing future releases.\\n" "${INFO}" "${COL_RED}" "${COL_NC}" "${ftlBranch}"
+        printf "  %b %b警告：%b 您正在使用来自自定义分支 (%s) 的 FTL，可能会错过未来的发布。\\n" "${INFO}" "${COL_RED}" "${COL_NC}" "${ftlBranch}"
     fi
 
     if [[ "${core_update}" == false && "${web_update}" == false && "${FTL_update}" == false ]]; then
         echo ""
-        echo -e "  ${TICK} Everything is up to date!"
+        echo -e "  ${TICK} 一切都是最新的！"
         exit 0
     fi
 
@@ -204,21 +204,21 @@ main() {
 
     if [[ "${core_update}" == true ]]; then
         echo ""
-        echo -e "  ${INFO} Pi-hole core files out of date, updating local repo."
+        echo -e "  ${INFO} Pi-hole 核心文件已过期，正在更新本地仓库。"
         getGitFiles "${PI_HOLE_FILES_DIR}" "${PI_HOLE_GIT_URL}"
-        echo -e "  ${INFO} If you had made any changes in '/etc/.pihole/', they have been stashed using 'git stash'"
+        echo -e "  ${INFO} 如果您在 '/etc/.pihole/' 中做了任何更改，它们已被使用 'git stash' 暂存"
     fi
 
     if [[ "${web_update}" == true ]]; then
         echo ""
-        echo -e "  ${INFO} Pi-hole Web Admin files out of date, updating local repo."
+        echo -e "  ${INFO} Pi-hole Web 管理文件已过期，正在更新本地仓库。"
         getGitFiles "${ADMIN_INTERFACE_DIR}" "${ADMIN_INTERFACE_GIT_URL}"
-        echo -e "  ${INFO} If you had made any changes in '${ADMIN_INTERFACE_DIR}', they have been stashed using 'git stash'"
+        echo -e "  ${INFO} 如果您在 '${ADMIN_INTERFACE_DIR}' 中做了任何更改，它们已被使用 'git stash' 暂存"
     fi
 
     if [[ "${FTL_update}" == true ]]; then
         echo ""
-        echo -e "  ${INFO} FTL out of date, it will be updated by the installer."
+        echo -e "  ${INFO} FTL 已过期，它将由安装程序更新。"
     fi
 
     if [[ "${FTL_update}" == true || "${core_update}" == true ]]; then
@@ -229,7 +229,7 @@ main() {
     if [[ "${FTL_update}" == true || "${core_update}" == true || "${web_update}" == true ]]; then
         # Update local and remote versions via updatechecker
         /opt/pihole/updatecheck.sh
-        echo -e "  ${INFO} Local version file information updated."
+        echo -e "  ${INFO} 本地版本文件信息已更新。"
     fi
 
     # if there was only a web update, show the new versions

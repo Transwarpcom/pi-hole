@@ -50,7 +50,7 @@ etag_support=false
 
 # Check gravity temp directory
 if [ ! -d "${GRAVITY_TMPDIR}" ] || [ ! -w "${GRAVITY_TMPDIR}" ]; then
-  echo -e "  ${COL_RED}Gravity temporary directory does not exist or is not a writeable directory, falling back to /tmp. ${COL_NC}"
+  echo -e "  ${COL_RED}Gravity 临时目录不存在或不可写，回退到 /tmp。 ${COL_NC}"
   GRAVITY_TMPDIR="/tmp"
 fi
 
@@ -78,7 +78,7 @@ fix_owner_permissions() {
 # Generate new SQLite3 file from schema template
 generate_gravity_database() {
   if ! pihole-FTL sqlite3 -ni "${gravityDBfile}" <"${gravityDBschema}"; then
-    echo -e "   ${CROSS} Unable to create ${gravityDBfile}"
+    echo -e "   ${CROSS} 无法创建 ${gravityDBfile}"
     return 1
   fi
   fix_owner_permissions "${gravityDBfile}"
@@ -87,7 +87,7 @@ generate_gravity_database() {
 # Build gravity tree
 gravity_build_tree() {
   local str
-  str="Building tree"
+  str="构建树"
   echo -ne "  ${INFO} ${str}..."
 
   # The index is intentionally not UNIQUE as poor quality adlists may contain domains more than once
@@ -95,8 +95,8 @@ gravity_build_tree() {
   status="$?"
 
   if [[ "${status}" -ne 0 ]]; then
-    echo -e "\\n  ${CROSS} Unable to build gravity tree in ${gravityTEMPfile}\\n  ${output}"
-    echo -e "  ${INFO} If you have a large amount of domains, make sure your Pi-hole has enough RAM available\\n"
+    echo -e "\\n  ${CROSS} 无法在 ${gravityTEMPfile} 中构建 gravity 树\\n  ${output}"
+    echo -e "  ${INFO} 如果您有大量域名，请确保您的 Pi-hole 有足够的可用 RAM\\n"
     return 1
   fi
   echo -e "${OVER}  ${TICK} ${str}"
@@ -113,7 +113,7 @@ rotate_gravity_backup() {
 
 # Copy data from old to new database file and swap them
 gravity_swap_databases() {
-  str="Swapping databases"
+  str="交换数据库"
   echo -ne "  ${INFO} ${str}..."
 
   # Swap databases and remove or conditionally rename old database
@@ -138,7 +138,7 @@ gravity_swap_databases() {
   status="$?"
 
   if [[ "${status}" -ne 0 ]]; then
-    echo -e "\\n  ${CROSS} Unable to clean current database for backup\\n  ${output}"
+    echo -e "\\n  ${CROSS} 无法清理当前数据库以进行备份\\n  ${output}"
   else
     # Check if the backup directory exists
     if [ ! -d "${gravityBCKdir}" ]; then
@@ -159,7 +159,7 @@ gravity_swap_databases() {
   echo -e "${OVER}  ${TICK} ${str}"
 
   if $oldAvail; then
-    echo -e "  ${TICK} The old database remains available"
+    echo -e "  ${TICK} 旧数据库仍然可用"
   fi
 }
 
@@ -169,7 +169,7 @@ update_gravity_timestamp() {
   status="$?"
 
   if [[ "${status}" -ne 0 ]]; then
-    echo -e "\\n  ${CROSS} Unable to update gravity timestamp in database ${gravityTEMPfile}\\n  ${output}"
+    echo -e "\\n  ${CROSS} 无法在数据库 ${gravityTEMPfile} 中更新 gravity 时间戳\\n  ${output}"
     return 1
   fi
   return 0
@@ -240,18 +240,18 @@ database_table_from_file() {
   status="$?"
 
   if [[ "${status}" -ne 0 ]]; then
-    echo -e "\\n  ${CROSS} Unable to fill table ${table}${list_type} in database ${gravityDBfile}\\n  ${output}"
+    echo -e "\\n  ${CROSS} 无法填充数据库 ${gravityDBfile} 中的表 ${table}${list_type}\\n  ${output}"
     gravity_Cleanup "error"
   fi
 
   # Move source file to backup directory, create directory if not existing
   mkdir -p "${backup_path}"
   mv "${src}" "${backup_file}" 2>/dev/null ||
-    echo -e "  ${CROSS} Unable to backup ${src} to ${backup_path}"
+    echo -e "  ${CROSS} 无法将 ${src} 备份到 ${backup_path}"
 
   # Delete tmpFile
   rm "${tmpFile}" >/dev/null 2>&1 ||
-    echo -e "  ${CROSS} Unable to remove ${tmpFile}"
+    echo -e "  ${CROSS} 无法删除 ${tmpFile}"
 }
 
 # Check if a column with name ${2} exists in gravity table with name ${1}
@@ -275,7 +275,7 @@ database_adlist_number() {
   status="$?"
 
   if [[ "${status}" -ne 0 ]]; then
-    echo -e "\\n  ${CROSS} Unable to update number of domains in adlist with ID ${1} in database ${gravityTEMPfile}\\n  ${output}"
+    echo -e "\\n  ${CROSS} 无法在数据库 ${gravityTEMPfile} 中更新 ID 为 ${1} 的广告列表的域名数量\\n  ${output}"
     gravity_Cleanup "error"
   fi
 }
@@ -291,7 +291,7 @@ database_adlist_status() {
   status="$?"
 
   if [[ "${status}" -ne 0 ]]; then
-    echo -e "\\n  ${CROSS} Unable to update status of adlist with ID ${1} in database ${gravityTEMPfile}\\n  ${output}"
+    echo -e "\\n  ${CROSS} 无法在数据库 ${gravityTEMPfile} 中更新 ID 为 ${1} 的广告列表的状态\\n  ${output}"
     gravity_Cleanup "error"
   fi
 }
@@ -301,9 +301,9 @@ migrate_to_database() {
   # Create database file only if not present
   if [ ! -e "${gravityDBfile}" ]; then
     # Create new database file - note that this will be created in version 1
-    echo -e "  ${INFO} Creating new gravity database"
+    echo -e "  ${INFO} 正在创建新的 gravity 数据库"
     if ! generate_gravity_database; then
-      echo -e "   ${CROSS} Error creating new gravity database. Please contact support."
+      echo -e "   ${CROSS} 创建新 gravity 数据库时出错。请联系支持。"
       return 1
     fi
 
@@ -313,24 +313,24 @@ migrate_to_database() {
     # Migrate list files to new database
     if [ -e "${adListFile}" ]; then
       # Store adlist domains in database
-      echo -e "  ${INFO} Migrating content of ${adListFile} into new database"
+      echo -e "  ${INFO} 将 ${adListFile} 的内容迁移到新数据库"
       database_table_from_file "adlist" "${adListFile}"
     fi
     if [ -e "${blacklistFile}" ]; then
       # Store blacklisted domains in database
-      echo -e "  ${INFO} Migrating content of ${blacklistFile} into new database"
+      echo -e "  ${INFO} 将 ${blacklistFile} 的内容迁移到新数据库"
       database_table_from_file "blacklist" "${blacklistFile}"
     fi
     if [ -e "${whitelistFile}" ]; then
       # Store whitelisted domains in database
-      echo -e "  ${INFO} Migrating content of ${whitelistFile} into new database"
+      echo -e "  ${INFO} 将 ${whitelistFile} 的内容迁移到新数据库"
       database_table_from_file "whitelist" "${whitelistFile}"
     fi
     if [ -e "${regexFile}" ]; then
       # Store regex domains in database
       # Important note: We need to add the domains to the "regex" table
       # as it will only later be renamed to "regex_blacklist"!
-      echo -e "  ${INFO} Migrating content of ${regexFile} into new database"
+      echo -e "  ${INFO} 将 ${regexFile} 的内容迁移到新数据库"
       database_table_from_file "regex" "${regexFile}"
     fi
   fi
@@ -345,20 +345,20 @@ gravity_CheckDNSResolutionAvailable() {
 
   # Determine if $lookupDomain is resolvable
   if timeout 4 getent hosts "${lookupDomain}" &>/dev/null; then
-    echo -e "${OVER}  ${TICK} DNS resolution is available\\n"
+    echo -e "${OVER}  ${TICK} DNS 解析可用\\n"
     return 0
   else
-    echo -e "  ${CROSS} DNS resolution is currently unavailable"
+    echo -e "  ${CROSS} DNS 解析当前不可用"
   fi
 
-  str="Waiting up to 120 seconds for DNS resolution..."
+  str="等待 DNS 解析最多 120 秒..."
   echo -ne "  ${INFO} ${str}"
 
  # Default DNS timeout is two seconds, plus 1 second for each dot > 120 seconds
   for ((i = 0; i < 40; i++)); do
       if getent hosts github.com &> /dev/null; then
         # If we reach this point, DNS resolution is available
-        echo -e "${OVER}  ${TICK} DNS resolution is available"
+        echo -e "${OVER}  ${TICK} DNS 解析可用"
         return 0
       fi
       # Append one dot for each second waiting
@@ -385,7 +385,7 @@ try_restore_backup () {
   filename="${gravityBCKfile}.${num}"
   # Check if a backup exists
   if [ -f "${filename}" ]; then
-    echo -e "  ${INFO} Attempting to restore previous database from backup no. ${num}"
+    echo -e "  ${INFO} 尝试从备份号 ${num} 恢复先前的数据库"
     cp "${filename}" "${gravityDBfile}"
 
     # If the backup was successfully copied, prepare a new gravity database from
@@ -396,7 +396,7 @@ try_restore_backup () {
 
       # Error checking
       if [[ "${status}" -ne 0 ]]; then
-        echo -e "\\n  ${CROSS} Unable to copy data from ${gravityDBfile} to ${gravityTEMPfile}\\n  ${output}"
+        echo -e "\\n  ${CROSS} 无法从 ${gravityDBfile} 复制数据到 ${gravityTEMPfile}\\n  ${output}"
         gravity_Cleanup "error"
       fi
 
@@ -408,43 +408,43 @@ try_restore_backup () {
 
       # Add a record to the info table to indicate that the gravity database was restored
       pihole-FTL sqlite3 "${gravityTEMPfile}" "INSERT OR REPLACE INTO info (property,value) values ('gravity_restored','${timestamp}');"
-      echo -e "  ${TICK} Successfully restored from backup (${gravityBCKfile}.${num} at ${timestamp})"
+      echo -e "  ${TICK} 已成功从备份恢复 (${gravityBCKfile}.${num} 于 ${timestamp})"
       return 0
     else
-      echo -e "  ${CROSS} Unable to restore backup no. ${num}"
+      echo -e "  ${CROSS} 无法恢复备份号 ${num}"
     fi
   fi
 
-  echo -e "  ${CROSS} Backup no. ${num} not available"
+  echo -e "  ${CROSS} 备份号 ${num} 不可用"
   return 1
 }
 
 # Retrieve blocklist URLs and parse domains from adlist.list
 gravity_DownloadBlocklists() {
-  echo -e "  ${INFO} ${COL_BOLD}Neutrino emissions detected${COL_NC}..."
+  echo -e "  ${INFO} ${COL_BOLD}检测到中微子辐射${COL_NC}..."
 
   if [[ "${gravityDBfile}" != "${gravityDBfile_default}" ]]; then
-    echo -e "  ${INFO} Storing gravity database in ${COL_BOLD}${gravityDBfile}${COL_NC}"
+    echo -e "  ${INFO} 将 gravity 数据库存储在 ${COL_BOLD}${gravityDBfile}${COL_NC}"
   fi
 
   local url domain str compression adlist_type directory success
   echo ""
 
   # Prepare new gravity database
-  str="Preparing new gravity database"
+  str="正在准备新的 gravity 数据库"
   echo -ne "  ${INFO} ${str}..."
   rm "${gravityTEMPfile}" >/dev/null 2>&1
   output=$({ pihole-FTL sqlite3 -ni "${gravityTEMPfile}" <"${gravityDBschema}"; } 2>&1)
   status="$?"
 
   if [[ "${status}" -ne 0 ]]; then
-    echo -e "\\n  ${CROSS} Unable to create new database ${gravityTEMPfile}\\n  ${output}"
+    echo -e "\\n  ${CROSS} 无法创建新数据库 ${gravityTEMPfile}\\n  ${output}"
     gravity_Cleanup "error"
   else
     echo -e "${OVER}  ${TICK} ${str}"
   fi
 
-  str="Creating new gravity databases"
+  str="正在创建新的 gravity 数据库"
   echo -ne "  ${INFO} ${str}..."
 
   # Gravity copying SQL script
@@ -458,7 +458,7 @@ gravity_DownloadBlocklists() {
   status="$?"
 
   if [[ "${status}" -ne 0 ]]; then
-    echo -e "\\n  ${CROSS} Unable to copy data from ${gravityDBfile} to ${gravityTEMPfile}\\n  ${output}"
+    echo -e "\\n  ${CROSS} 无法从 ${gravityDBfile} 复制数据到 ${gravityTEMPfile}\\n  ${output}"
 
     # Try to attempt a backup restore
     success=false
@@ -499,11 +499,11 @@ gravity_DownloadBlocklists() {
     }' <<<"$(printf '%s\n' "${sources[@]}")" 2>/dev/null
   )"
 
-  local str="Pulling blocklist source list into range"
+  local str="将屏蔽列表源列表拉入范围"
   echo -e "${OVER}  ${TICK} ${str}"
 
   if [[ -z "${sources[*]}" ]] || [[ -z "${sourceDomains[*]}" ]]; then
-    echo -e "  ${INFO} No source list found, or it is empty"
+    echo -e "  ${INFO} 未找到源列表，或列表为空"
     echo ""
     unset sources
   fi
@@ -513,10 +513,10 @@ gravity_DownloadBlocklists() {
   # only if it is supported by the locally available version of curl
   if curl -V | grep -q "Features:.* libz"; then
     compression="--compressed"
-    echo -e "  ${INFO} Using libz compression\n"
+    echo -e "  ${INFO} 使用 libz 压缩\n"
   else
     compression=""
-    echo -e "  ${INFO} Libz compression not available\n"
+    echo -e "  ${INFO} Libz 压缩不可用\n"
   fi
 
   # Check if etag is supported by the locally available version of curl
@@ -551,20 +551,20 @@ gravity_DownloadBlocklists() {
     # First, check if the directory is writable
     directory="$(dirname -- "${saveLocation}")"
     if [ ! -w "${directory}" ]; then
-      echo -e "  ${CROSS} Unable to write to ${directory}"
-      echo "      Please run pihole -g as root"
+      echo -e "  ${CROSS} 无法写入 ${directory}"
+      echo "      请以 root 身份运行 pihole -g"
       echo ""
       continue
     fi
     # Then, check if the file is writable (if it exists)
     if [ -e "${saveLocation}" ] && [ ! -w "${saveLocation}" ]; then
-      echo -e "  ${CROSS} Unable to write to ${saveLocation}"
-      echo "      Please run pihole -g as root"
+      echo -e "  ${CROSS} 无法写入 ${saveLocation}"
+      echo "      请以 root 身份运行 pihole -g"
       echo ""
       continue
     fi
 
-    echo -e "  ${INFO} Target: ${url}"
+    echo -e "  ${INFO} 目标: ${url}"
     local regex check_url
     # Check for characters NOT allowed in URLs
     regex="[^a-zA-Z0-9:/?&%=~._()-;]"
@@ -574,7 +574,7 @@ gravity_DownloadBlocklists() {
     check_url="$(sed -re 's#([^:/]*://)?([^/]+)@#\1\2#' <<<"$url")"
 
     if [[ "${check_url}" =~ ${regex} ]]; then
-      echo -e "  ${CROSS} Invalid Target"
+      echo -e "  ${CROSS} 无效目标"
     else
       timeit gravity_DownloadBlocklistFromUrl "${url}" "${sourceIDs[$i]}" "${saveLocation}" "${compression}" "${adlist_type}" "${domain}"
     fi
@@ -593,10 +593,10 @@ compareLists() {
       # The list changed upstream, we need to update the checksum
       sha1sum "${target}" >"${target}.sha1"
       fix_owner_permissions "${target}.sha1"
-      echo "  ${INFO} List has been updated"
+      echo "  ${INFO} 列表已更新"
       database_adlist_status "${adlistID}" "1"
     else
-      echo "  ${INFO} List stayed unchanged"
+      echo "  ${INFO} 列表保持不变"
       database_adlist_status "${adlistID}" "2"
     fi
   else
@@ -655,8 +655,8 @@ gravity_DownloadBlocklistFromUrl() {
     fi
   fi
 
-  str="Status:"
-  echo -ne "  ${INFO} ${str} Pending..."
+  str="状态:"
+  echo -ne "  ${INFO} ${str} 等待中..."
   blocked=false
   # Check if this domain is blocked by Pi-hole but only if the domain is not a
   # local file or empty
@@ -715,8 +715,8 @@ gravity_DownloadBlocklistFromUrl() {
       else
         port=80
       fi
-      echo -e "${OVER}  ${CROSS} ${str} ${domain} is blocked by one of your lists. Using DNS server ${upstream} instead"
-      echo -ne "  ${INFO} ${str} Pending..."
+      echo -e "${OVER}  ${CROSS} ${str} ${domain} 被您的某个列表屏蔽。改为使用 DNS 服务器 ${upstream}"
+      echo -ne "  ${INFO} ${str} 等待中..."
       customUpstreamResolver="--resolve $domain:$port:$ip"
     fi
   fi
@@ -731,17 +731,17 @@ gravity_DownloadBlocklistFromUrl() {
     # Check if the file exists and is a regular file (i.e. not a socket, fifo, tty, block). Might still be a symlink.
     if [[ ! -f $file_path ]]; then
       # Output that the file does not exist
-      echo -e "${OVER}  ${CROSS} ${file_path} does not exist"
+      echo -e "${OVER}  ${CROSS} ${file_path} 不存在"
       download=false
     else
       # Check if the file or a file referenced by the symlink has a+r permissions
       permissions=$(stat -L -c "%a" "$file_path")
       if [[ $permissions == *4 || $permissions == *5 || $permissions == *6 || $permissions == *7 ]]; then
         # Output that we are using the local file
-        echo -e "${OVER}  ${INFO} Using local file ${file_path}"
+        echo -e "${OVER}  ${INFO} 使用本地文件 ${file_path}"
       else
         # Output that the file does not have the correct permissions
-        echo -e "${OVER}  ${CROSS} Cannot read file (file needs to have a+r permission)"
+        echo -e "${OVER}  ${CROSS} 无法读取文件（文件需要具有 a+r 权限）"
         download=false
       fi
     fi
@@ -749,8 +749,8 @@ gravity_DownloadBlocklistFromUrl() {
 
   # Check for allowed protocols
   if [[ $url != "http"* && $url != "https"* && $url != "file"* && $url != "ftp"* && $url != "ftps"* && $url != "sftp"* ]]; then
-    echo -e "${OVER}  ${CROSS} ${str} Invalid protocol specified. Ignoring list."
-    echo -e "      Ensure your URL starts with a valid protocol like http:// , https:// or file:// ."
+    echo -e "${OVER}  ${CROSS} ${str} 指定了无效的协议。忽略列表。"
+    echo -e "      确保您的 URL 以有效协议开头，例如 http:// 、https:// 或 file:// 。"
     download=false
   fi
 
@@ -762,10 +762,10 @@ gravity_DownloadBlocklistFromUrl() {
   # Did we "download" a local file?
   "file"*)
     if [[ -s "${listCurlBuffer}" ]]; then
-      echo -e "${OVER}  ${TICK} ${str} Retrieval successful"
+      echo -e "${OVER}  ${TICK} ${str} 检索成功"
       success=true
     else
-      echo -e "${OVER}  ${CROSS} ${str} Retrieval failed / empty list"
+      echo -e "${OVER}  ${CROSS} ${str} 检索失败 / 列表为空"
     fi
     ;;
   # Did we "download" a remote file?
@@ -773,22 +773,22 @@ gravity_DownloadBlocklistFromUrl() {
     # Determine "Status:" output based on HTTP response
     case "${httpCode}" in
     "200")
-      echo -e "${OVER}  ${TICK} ${str} Retrieval successful"
+      echo -e "${OVER}  ${TICK} ${str} 检索成功"
       success=true
       ;;
     "304")
-      echo -e "${OVER}  ${TICK} ${str} No changes detected"
+      echo -e "${OVER}  ${TICK} ${str} 未检测到更改"
       success=true
       ;;
-    "000") echo -e "${OVER}  ${CROSS} ${str} Connection Refused" ;;
-    "403") echo -e "${OVER}  ${CROSS} ${str} Forbidden" ;;
-    "404") echo -e "${OVER}  ${CROSS} ${str} Not found" ;;
-    "408") echo -e "${OVER}  ${CROSS} ${str} Time-out" ;;
-    "451") echo -e "${OVER}  ${CROSS} ${str} Unavailable For Legal Reasons" ;;
-    "500") echo -e "${OVER}  ${CROSS} ${str} Internal Server Error" ;;
-    "504") echo -e "${OVER}  ${CROSS} ${str} Connection Timed Out (Gateway)" ;;
-    "521") echo -e "${OVER}  ${CROSS} ${str} Web Server Is Down (Cloudflare)" ;;
-    "522") echo -e "${OVER}  ${CROSS} ${str} Connection Timed Out (Cloudflare)" ;;
+    "000") echo -e "${OVER}  ${CROSS} ${str} 连接被拒绝" ;;
+    "403") echo -e "${OVER}  ${CROSS} ${str} 禁止访问" ;;
+    "404") echo -e "${OVER}  ${CROSS} ${str} 未找到" ;;
+    "408") echo -e "${OVER}  ${CROSS} ${str} 超时" ;;
+    "451") echo -e "${OVER}  ${CROSS} ${str} 因法律原因不可用" ;;
+    "500") echo -e "${OVER}  ${CROSS} ${str} 内部服务器错误" ;;
+    "504") echo -e "${OVER}  ${CROSS} ${str} 连接超时（网关）" ;;
+    "521") echo -e "${OVER}  ${CROSS} ${str} Web 服务器关闭 (Cloudflare)" ;;
+    "522") echo -e "${OVER}  ${CROSS} ${str} 连接超时 (Cloudflare)" ;;
     *) echo -e "${OVER}  ${CROSS} ${str} ${url} (${httpCode})" ;;
     esac
     ;;
@@ -816,7 +816,7 @@ gravity_DownloadBlocklistFromUrl() {
       done="true"
     else
       # Fall back to previously cached list if $listCurlBuffer is empty
-      echo -e "  ${INFO} Received empty file"
+      echo -e "  ${INFO} 收到空文件"
     fi
   fi
 
@@ -824,13 +824,13 @@ gravity_DownloadBlocklistFromUrl() {
   if [[ "${done}" != "true" ]]; then
     # Determine if cached list has read permission
     if [[ -r "${saveLocation}" ]]; then
-      echo -e "  ${CROSS} List download failed: ${COL_GREEN}using previously cached list${COL_NC}"
+      echo -e "  ${CROSS} 列表下载失败：${COL_GREEN}使用先前缓存的列表${COL_NC}"
       # Set list status to "download-failed/cached"
       database_adlist_status "${adlistID}" "3"
       # Add domains to database table file
       pihole-FTL "${gravity_type}" parseList "${saveLocation}" "${gravityTEMPfile}" "${adlistID}"
     else
-      echo -e "  ${CROSS} List download failed: ${COL_RED}no cached list available${COL_NC}"
+      echo -e "  ${CROSS} 列表下载失败：${COL_RED}没有可用的缓存列表${COL_NC}"
       # Manually reset these two numbers because we do not call parseList here
       database_adlist_number "${adlistID}" 0 0
       database_adlist_status "${adlistID}" "4"
@@ -847,10 +847,10 @@ gravity_Table_Count() {
   if [[ "${table}" == "gravity" ]]; then
     local unique
     unique="$(pihole-FTL sqlite3 -ni "${gravityTEMPfile}" "SELECT COUNT(*) FROM (SELECT DISTINCT domain FROM ${table});")"
-    echo -e "  ${INFO} Number of ${str}: ${num} (${COL_BOLD}${unique} unique domains${COL_NC})"
+    echo -e "  ${INFO} ${str}的数量: ${num} (${COL_BOLD}${unique} 个唯一域名${COL_NC})"
     pihole-FTL sqlite3 -ni "${gravityTEMPfile}" "INSERT OR REPLACE INTO info (property,value) VALUES ('gravity_count',${unique});"
   else
-    echo -e "  ${INFO} Number of ${str}: ${num}"
+    echo -e "  ${INFO} ${str}的数量: ${num}"
   fi
 }
 
@@ -858,23 +858,23 @@ gravity_Table_Count() {
 gravity_ShowCount() {
   # Here we use the table "gravity" instead of the view "vw_gravity" for speed.
   # It's safe to replace it here, because right after a gravity run both will show the exactly same number of domains.
-  gravity_Table_Count "gravity" "gravity domains"
-  gravity_Table_Count "domainlist WHERE type = 1 AND enabled = 1" "exact denied domains"
-  gravity_Table_Count "domainlist WHERE type = 3 AND enabled = 1" "regex denied filters"
-  gravity_Table_Count "domainlist WHERE type = 0 AND enabled = 1" "exact allowed domains"
-  gravity_Table_Count "domainlist WHERE type = 2 AND enabled = 1" "regex allowed filters"
+  gravity_Table_Count "gravity" "gravity 域名"
+  gravity_Table_Count "domainlist WHERE type = 1 AND enabled = 1" "精确拒绝域名"
+  gravity_Table_Count "domainlist WHERE type = 3 AND enabled = 1" "正则拒绝过滤器"
+  gravity_Table_Count "domainlist WHERE type = 0 AND enabled = 1" "精确允许域名"
+  gravity_Table_Count "domainlist WHERE type = 2 AND enabled = 1" "正则允许过滤器"
 }
 
 # Trap Ctrl-C
 gravity_Trap() {
-  trap '{ echo -e "\\n\\n  ${INFO} ${COL_RED}User-abort detected${COL_NC}"; gravity_Cleanup "error"; }' INT
+  trap '{ echo -e "\\n\\n  ${INFO} ${COL_RED}检测到用户中止${COL_NC}"; gravity_Cleanup "error"; }' INT
 }
 
 # Clean up after Gravity upon exit or cancellation
 gravity_Cleanup() {
   local error="${1:-}"
 
-  str="Cleaning up stray matter"
+  str="清理残留物"
   echo -ne "  ${INFO} ${str}..."
 
   # Delete tmp content generated by Gravity
@@ -892,7 +892,7 @@ gravity_Cleanup() {
       # If list is not in active array, then remove it and all associated files
       if [[ ! "${activeDomains[*]}" == *"${file}"* ]]; then
         rm -f "${file}"* 2>/dev/null ||
-          echo -e "  ${CROSS} Failed to remove ${file##*/}"
+          echo -e "  ${CROSS} 无法删除 ${file##*/}"
       fi
     done
   fi
@@ -908,46 +908,46 @@ gravity_Cleanup() {
 
 database_recovery() {
   local result
-  local str="Checking integrity of existing gravity database (this can take a while)"
+  local str="检查现有 gravity 数据库的完整性（这可能需要一段时间）"
   local option="${1}"
   echo -ne "  ${INFO} ${str}..."
   result="$(pihole-FTL sqlite3 -ni "${gravityDBfile}" "PRAGMA integrity_check" 2>&1)"
 
   if [[ ${result} = "ok" ]]; then
-    echo -e "${OVER}  ${TICK} ${str} - no errors found"
+    echo -e "${OVER}  ${TICK} ${str} - 未发现错误"
 
-    str="Checking foreign keys of existing gravity database (this can take a while)"
+    str="检查现有 gravity 数据库的外键（这可能需要一段时间）"
     echo -ne "  ${INFO} ${str}..."
     unset result
     result="$(pihole-FTL sqlite3 -ni "${gravityDBfile}" "PRAGMA foreign_key_check" 2>&1)"
     if [[ -z ${result} ]]; then
-      echo -e "${OVER}  ${TICK} ${str} - no errors found"
+      echo -e "${OVER}  ${TICK} ${str} - 未发现错误"
       if [[ "${option}" != "force" ]]; then
         return
       fi
     else
-      echo -e "${OVER}  ${CROSS} ${str} - errors found:"
+      echo -e "${OVER}  ${CROSS} ${str} - 发现错误："
       while IFS= read -r line; do echo "  - $line"; done <<<"$result"
     fi
   else
-    echo -e "${OVER}  ${CROSS} ${str} - errors found:"
+    echo -e "${OVER}  ${CROSS} ${str} - 发现错误："
     while IFS= read -r line; do echo "  - $line"; done <<<"$result"
   fi
 
-  str="Trying to recover existing gravity database"
+  str="尝试恢复现有的 gravity 数据库"
   echo -ne "  ${INFO} ${str}..."
   # We have to remove any possibly existing recovery database or this will fail
   rm -f "${gravityDBfile}.recovered" >/dev/null 2>&1
   if result="$(pihole-FTL sqlite3 -ni "${gravityDBfile}" ".recover" | pihole-FTL sqlite3 -ni "${gravityDBfile}.recovered" 2>&1)"; then
-    echo -e "${OVER}  ${TICK} ${str} - success"
+    echo -e "${OVER}  ${TICK} ${str} - 成功"
     mv "${gravityDBfile}" "${gravityDBfile}.old"
     mv "${gravityDBfile}.recovered" "${gravityDBfile}"
-    echo -ne " ${INFO} ${gravityDBfile} has been recovered"
-    echo -ne " ${INFO} The old ${gravityDBfile} has been moved to ${gravityDBfile}.old"
+    echo -ne " ${INFO} ${gravityDBfile} 已恢复"
+    echo -ne " ${INFO} 旧的 ${gravityDBfile} 已移动到 ${gravityDBfile}.old"
   else
-    echo -e "${OVER}  ${CROSS} ${str} - the following errors happened:"
+    echo -e "${OVER}  ${CROSS} ${str} - 发生了以下错误："
     while IFS= read -r line; do echo "  - $line"; done <<<"$result"
-    echo -e "  ${CROSS} Recovery failed. Try \"pihole -r recreate\" instead."
+    echo -e "  ${CROSS} 恢复失败。请改试 \"pihole -r recreate\"。"
     exit 1
   fi
   echo ""
@@ -958,13 +958,13 @@ gravity_optimize() {
     # the collected information in internal tables of the database where the
     # query optimizer can access the information and use it to help make better
     # query planning choices
-    local str="Optimizing database"
+    local str="优化数据库"
     echo -ne "  ${INFO} ${str}..."
     output=$( { pihole-FTL sqlite3 -ni "${gravityTEMPfile}" "PRAGMA analysis_limit=0; ANALYZE" 2>&1; } 2>&1 )
     status="$?"
 
     if [[ "${status}" -ne 0 ]]; then
-        echo -e "\\n  ${CROSS} Unable to optimize database ${gravityTEMPfile}\\n  ${output}"
+        echo -e "\\n  ${CROSS} 无法优化数据库 ${gravityTEMPfile}\\n  ${output}"
         gravity_Cleanup "error"
     else
         echo -e "${OVER}  ${TICK} ${str}"
@@ -1011,7 +1011,7 @@ timeit(){
   elapsed_time=$((end_time - start_time))
 
   # Display the elapsed time
-  printf "  %b--> took %d.%03d seconds%b\n" "${COL_BLUE}" $((elapsed_time / 1000)) $((elapsed_time % 1000)) "${COL_NC}"
+  printf "  %b--> 耗时 %d.%03d 秒%b\n" "${COL_BLUE}" $((elapsed_time / 1000)) $((elapsed_time % 1000)) "${COL_NC}"
 
   return $ret
 }
@@ -1023,7 +1023,7 @@ migrate_to_listsCache_dir() {
   fi
 
   # If not, we need to migrate the old files to the new directory
-  local str="Migrating the list's cache directory to new location"
+  local str="迁移列表缓存目录到新位置"
   echo -ne "  ${INFO} ${str}..."
   mkdir -p "${listsCacheDir}" && chown pihole:pihole "${listsCacheDir}"
 
@@ -1039,13 +1039,13 @@ migrate_to_listsCache_dir() {
 }
 
 helpFunc() {
-  echo "Usage: pihole -g
-Update domains from blocklists specified in adlists.list
+  echo "用法：pihole -g
+从 adlists.list 中指定的屏蔽列表更新域名
 
-Options:
-  -f, --force          Force the download of all specified blocklists
-  -t, --timeit         Time the gravity update process
-  -h, --help           Show this help dialog"
+选项：
+  -f, --force          强制下载所有指定的屏蔽列表
+  -t, --timeit         计时 gravity 更新过程
+  -h, --help           显示此帮助对话框"
   exit 0
 }
 
@@ -1054,25 +1054,21 @@ repairSelector() {
   "recover") recover_database=true ;;
   "recreate") recreate_database=true ;;
   *)
-    echo "Usage: pihole -g -r {recover,recreate}
-Attempt to repair gravity database
+    echo "用法：pihole -g -r {recover,recreate}
+尝试修复 gravity 数据库
 
-Available options:
-  pihole -g -r recover        Try to recover a damaged gravity database file.
-                              Pi-hole tries to restore as much as possible
-                              from a corrupted gravity database.
+可用选项：
+  pihole -g -r recover        尝试恢复损坏的 gravity 数据库文件。
+                              Pi-hole 尝试从损坏的 gravity 数据库恢复尽可能多的数据。
 
-  pihole -g -r recover force  Pi-hole will run the recovery process even when
-                              no damage is detected. This option is meant to be
-                              a last resort. Recovery is a fragile task
-                              consuming a lot of resources and shouldn't be
-                              performed unnecessarily.
+  pihole -g -r recover force  即使未检测到损坏，Pi-hole 也会运行恢复过程。
+                              此选项旨在作为最后手段。恢复是一项脆弱的任务，
+                              消耗大量资源，不应不必要地执行。
 
-  pihole -g -r recreate       Create a new gravity database file from scratch.
-                              This will remove your existing gravity database
-                              and create a new file from scratch. If you still
-                              have the migration backup created when migrating
-                              to Pi-hole v5.0, Pi-hole will import these files."
+  pihole -g -r recreate       从头开始创建新的 gravity 数据库文件。
+                              这将删除现有的 gravity 数据库并从头开始创建新文件。
+                              如果您仍然拥有迁移到 Pi-hole v5.0 时创建的迁移备份，
+                              Pi-hole 将导入这些文件。"
     exit 0
     ;;
   esac
@@ -1093,7 +1089,7 @@ done
 
 # Check if DNS is available, no need to do any database manipulation if we're not able to download adlists
 if ! timeit gravity_CheckDNSResolutionAvailable; then
-  echo -e "   ${CROSS} No DNS resolution available. Please contact support."
+  echo -e "   ${CROSS} 没有可用的 DNS 解析。请联系支持。"
   exit 1
 fi
 
@@ -1106,7 +1102,7 @@ fi
 gravity_Trap
 
 if [[ "${recreate_database:-}" == true ]]; then
-  str="Recreating gravity database from migration backup"
+  str="从迁移备份重新创建 gravity 数据库"
   echo -ne "${INFO} ${str}..."
   rm "${gravityDBfile}"
   pushd "${piholeDir}" >/dev/null || exit
@@ -1124,12 +1120,12 @@ migrate_to_listsCache_dir
 
 # Move possibly existing legacy files to the gravity database
 if ! timeit migrate_to_database; then
-  echo -e "   ${CROSS} Unable to migrate to database. Please contact support."
+  echo -e "   ${CROSS} 无法迁移到数据库。请联系支持。"
   exit 1
 fi
 
 if [[ "${forceDelete:-}" == true ]]; then
-  str="Deleting existing list cache"
+  str="删除现有的列表缓存"
   echo -ne "  ${INFO} ${str}..."
 
   rm "${listsCacheDir}/list.*" 2>/dev/null || true
@@ -1138,7 +1134,7 @@ fi
 
 # Gravity downloads blocklists next
 if ! gravity_DownloadBlocklists; then
-  echo -e "   ${CROSS} Unable to create gravity database. Please try again later. If the problem persists, please contact support."
+  echo -e "   ${CROSS} 无法创建 gravity 数据库。请稍后重试。如果问题仍然存在，请联系支持。"
   exit 1
 fi
 
@@ -1161,13 +1157,13 @@ timeit gravity_optimize
 # Migrate rest of the data from old to new database
 # IMPORTANT: Swapping the databases must be the last step before the cleanup
 if ! timeit gravity_swap_databases; then
-  echo -e "   ${CROSS} Unable to create database. Please contact support."
+  echo -e "   ${CROSS} 无法创建数据库。请联系支持。"
   exit 1
 fi
 
 timeit gravity_Cleanup
 echo ""
 
-echo "  ${TICK} Done."
+echo "  ${TICK} 完成。"
 
 # "${PIHOLE_COMMAND}" status

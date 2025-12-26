@@ -1835,6 +1835,11 @@ clone_or_reset_repos() {
                 exit 1
             }
     fi
+
+    # Apply Web UI Localization if available
+    if [ -f "/opt/pihole/localize_web.sh" ]; then
+        /opt/pihole/localize_web.sh "${webInterfaceDir}" || true
+    fi
 }
 
 # Download FTL binary to random temp directory and install FTL binary
